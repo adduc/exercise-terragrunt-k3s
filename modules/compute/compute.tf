@@ -61,8 +61,8 @@ resource "docker_container" "k3s" {
   }
 
   ports {
-    internal = 30000
-    external = 30000
+    internal = 80
+    external = 30080
   }
 
   volumes {

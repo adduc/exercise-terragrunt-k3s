@@ -50,7 +50,7 @@ resource "kubernetes_namespace" "nginx-gateway" {
 }
 
 # Nginx Gateway Fabric (Gateway API implementation)
-# helm install ngf oci://ghcr.io/nginxinc/charts/nginx-gateway-fabric --create-namespace -n nginx-gateway
+# @see https://github.com/nginxinc/nginx-gateway-fabric
 resource "helm_release" "nginx_gateway_fabric" {
   depends_on = [kubernetes_namespace.nginx-gateway]
   name       = "nginx-gateway-fabric"
@@ -58,4 +58,16 @@ resource "helm_release" "nginx_gateway_fabric" {
   chart      = "nginx-gateway-fabric"
   version    = "1.3.0"
   namespace  = kubernetes_namespace.nginx-gateway.metadata.0.name
+
+  values = [
+    yamlencode({
+      service = {
+        type = "NodePort"
+        ports = [{
+          port       = 30080
+          targetPort = 30080
+        }]
+      }
+    })
+  ]
 }

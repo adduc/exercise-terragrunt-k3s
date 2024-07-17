@@ -1,0 +1,12 @@
+#!/bin/bash
+
+SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
+
+[ -z "$1" ] && >&2 echo "Usage: $0 <env-name> <command...>" && exit 1
+
+ENV_NAME=$1
+COMMAND=${@:2}
+
+kubectl \
+  --kubeconfig "${SCRIPT_DIR}/environments/${ENV_NAME}/.kubeconfig/kubeconfig.yaml" \
+  ${COMMAND}

@@ -1,0 +1,9 @@
+# Terraform provider lock files
+# - provider versions are managed with terragrunt
+.terraform.lock.hcl
+
+# Terragrunt's module cache
+.terragrunt-cache
+
+# Cluster access
+kubeconfig.yaml

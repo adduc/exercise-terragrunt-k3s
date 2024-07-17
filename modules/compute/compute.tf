@@ -12,9 +12,11 @@ terraform {
 
 ## Variables
 
+variable "env_name" { type = string }
+
 variable "k3s_version" { default = "v1.29.6-k3s1" }
 variable "k3s_token" { default = "changeme" }
-variable "k3s_config_dir" { default = "./config" }
+variable "k3s_config_dir" { default = "../config" }
 
 ## Providers
 
@@ -27,11 +29,13 @@ resource "docker_image" "k3s" {
 }
 
 resource "docker_container" "k3s" {
-  name  = "k3s"
+  name  = "${var.env_name}_k3s"
   image = docker_image.k3s.image_id
   restart = "unless-stopped"
   stop_signal = "SIGKILL"
   privileged = true
+
+  network_mode = "bridge"
 
   command = [
     "server",

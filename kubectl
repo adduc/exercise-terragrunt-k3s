@@ -1,4 +1,10 @@
 #!/bin/bash
+##
+# This script is used to run kubectl commands against a specific
+# environment.
+#
+# Usage: ./kubectl <env-name> <command...>
+##
 
 SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 
@@ -7,6 +13,17 @@ SCRIPT_DIR="$( cd "$( dirname "${BASH_SOURCE[0]}" )" && pwd )"
 ENV_NAME=$1
 COMMAND=${@:2}
 
-kubectl \
-  --kubeconfig "${SCRIPT_DIR}/environments/${ENV_NAME}/.kubeconfig/kubeconfig.yaml" \
-  ${COMMAND}
+KUBECONFIG="${SCRIPT_DIR}/environments/${ENV_NAME}/.kubeconfig/kubeconfig.yaml"
+
+case "$COMMAND" in
+
+  teardown|down|destroy|rm)
+    docker kill "${ENV_NAME}_k3s" && docker rm "${ENV_NAME}_k3s"
+    ;;
+
+  *)
+    kubectl \
+      --kubeconfig "$KUBECONFIG" \
+      ${COMMAND}
+      ;;
+esac

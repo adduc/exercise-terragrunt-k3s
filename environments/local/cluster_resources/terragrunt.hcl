@@ -3,7 +3,7 @@ terraform {
 }
 
 inputs = {
-  k3s_config_dir = abspath("../.kubeconfig")
+  k3s_config_dir = abspath("${get_original_terragrunt_dir()}/../.kubeconfig")
 }
 
 dependency "cluster_crds" {

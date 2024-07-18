@@ -31,17 +31,7 @@ provider "helm" {
   }
 }
 
-## Resources
-
-# Gateway API CRDs
-# @see https://gateway-api.sigs.k8s.io/
-# @see https://artifacthub.io/packages/helm/portefaix-hub/gateway-api-crds
-resource "helm_release" "gateway_api" {
-  name       = "my-gateway-api-crds"
-  repository = "https://charts.portefaix.xyz/"
-  chart      = "gateway-api-crds"
-  version    = "1.1.0"
-}
+## Nginx Gateway Fabric (Gateway API implementation)
 
 resource "kubernetes_namespace" "nginx-gateway" {
   metadata {
@@ -49,7 +39,6 @@ resource "kubernetes_namespace" "nginx-gateway" {
   }
 }
 
-# Nginx Gateway Fabric (Gateway API implementation)
 # @see https://github.com/nginxinc/nginx-gateway-fabric
 resource "helm_release" "nginx_gateway_fabric" {
   depends_on = [kubernetes_namespace.nginx-gateway]
@@ -66,8 +55,46 @@ resource "helm_release" "nginx_gateway_fabric" {
         ports = [{
           port       = 30080
           targetPort = 30080
+          nodePort   = 30080
         }]
       }
     })
   ]
+}
+
+## Cluster Gateway
+
+resource "kubernetes_namespace" "cluster" {
+  metadata {
+    name = "cluster"
+  }
+}
+
+resource "kubernetes_manifest" "gateway" {
+  depends_on = [helm_release.nginx_gateway_fabric, kubernetes_namespace.cluster]
+
+  manifest = {
+    apiVersion = "gateway.networking.k8s.io/v1"
+    kind       = "Gateway"
+
+    metadata = {
+      name      = "gateway"
+      namespace = kubernetes_namespace.cluster.metadata[0].name
+    }
+
+    spec = {
+      gatewayClassName = "nginx"
+
+      listeners = [{
+        name     = "http"
+        port     = 30080
+        protocol = "HTTP"
+        allowedRoutes = {
+          namespaces = {
+            from = "All"
+          }
+        }
+      }]
+    }
+  }
 }

@@ -6,7 +6,7 @@ inputs = {
   k3s_config_dir = abspath("../.kubeconfig")
 }
 
-dependency "compute" {
-  config_path = "../compute"
+dependency "cluster_crds" {
+  config_path = "../cluster_crds"
   skip_outputs = true
 }

@@ -29,11 +29,11 @@ resource "docker_image" "k3s" {
 }
 
 resource "docker_container" "k3s" {
-  name  = "${var.env_name}_k3s"
-  image = docker_image.k3s.image_id
-  restart = "unless-stopped"
+  name        = "${var.env_name}_k3s"
+  image       = docker_image.k3s.image_id
+  restart     = "unless-stopped"
   stop_signal = "SIGKILL"
-  privileged = true
+  privileged  = true
 
   network_mode = "bridge"
 
@@ -45,7 +45,7 @@ resource "docker_container" "k3s" {
   ]
 
   tmpfs = {
-    "/run" = "",
+    "/run"     = "",
     "/var/run" = "",
   }
 
@@ -61,7 +61,7 @@ resource "docker_container" "k3s" {
   }
 
   ports {
-    internal = 80
+    internal = 30080
     external = 30080
   }
 

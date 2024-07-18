@@ -1,5 +1,5 @@
 terraform {
-  source = "../../../modules//compute"
+  source = "../../../modules//docker_images"
 }
 
 inputs = {

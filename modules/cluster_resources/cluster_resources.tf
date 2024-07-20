@@ -31,6 +31,27 @@ provider "helm" {
   }
 }
 
+## ArgoCD
+
+resource "kubernetes_namespace" "argo" {
+  metadata {
+    name = "argo"
+  }
+}
+
+## Argo CD
+
+# @see https://argoproj.github.io/cd/
+# @see https://github.com/argoproj/argo-helm/tree/main
+resource "helm_release" "argo" {
+  depends_on = [kubernetes_namespace.argo]
+  name       = "argo"
+  repository = "https://argoproj.github.io/argo-helm"
+  chart      = "argo-cd"
+  version    = "7.3.8"
+  namespace  = kubernetes_namespace.argo.metadata.0.name
+}
+
 ## Nginx Gateway Fabric (Gateway API implementation)
 
 resource "kubernetes_namespace" "nginx-gateway" {
